@@ -4,6 +4,11 @@
   const $ = selector => document.querySelector(selector);
   const icon = name => `<svg aria-hidden="true"><use href="#i-${name}"/></svg>`;
   const time = seconds => `${Math.floor(seconds / 60).toString().padStart(2, '0')}:${Math.floor(seconds % 60).toString().padStart(2, '0')}`;
+  const resource = path => `${path}${path.includes('?') ? '&' : '?'}v=memorial-20260914`;
+  document.querySelectorAll('[data-film-duration]').forEach(node => { node.textContent = time(Math.round(story.duration)); });
+  document.querySelectorAll('[data-photo-count]').forEach(node => { node.textContent = story.photos.length; });
+  document.querySelectorAll('[data-video-count]').forEach(node => { node.textContent = story.highlights.length; });
+  document.querySelectorAll('[data-live-count]').forEach(node => { node.textContent = story.photos.filter(photo => photo.live).length; });
   const movie = $('#movie');
   const screenPlay = $('#screen-play');
   let toastTimer;
@@ -24,15 +29,15 @@
       await movie.play();
     } catch {
       screenPlay.hidden = false;
-      toast('請按影片上的播放按鈕開始欣賞。');
+      toast('請按影片上的播放按鈕開始觀看。');
     }
   }
   document.querySelectorAll('[data-play]').forEach(button => button.addEventListener('click', () => playAt(Number(button.dataset.play))));
   screenPlay.addEventListener('click', () => playAt(movie.currentTime || 0));
   $('#restart').addEventListener('click', () => playAt(0));
   movie.addEventListener('play', () => { screenPlay.hidden = true; });
-  movie.addEventListener('ended', () => { $('#now-playing').textContent = '未完，待續。再看一次，依然美好。'; });
-  movie.addEventListener('error', () => toast('影片暫時無法載入，請重新整理，或使用「下載影片」。'));
+  movie.addEventListener('ended', () => { $('#now-playing').textContent = '爸爸，謝謝您。我們永遠想念您。'; });
+  movie.addEventListener('error', () => toast('影片暫時無法載入，請重新整理，或使用「下載追思影片」。'));
   $('#fullscreen').addEventListener('click', async () => {
     try {
       if (movie.requestFullscreen) await movie.requestFullscreen();
@@ -61,40 +66,42 @@
         else button.removeAttribute('aria-current');
       });
     }
-    if (!movie.ended) $('#now-playing').textContent = chapterIndex >= 0 ? `${story.chapters[chapterIndex].number} / ${story.chapters[chapterIndex].title}` : '序幕 / 一起走過的日子';
+    if (!movie.ended) $('#now-playing').textContent = chapterIndex >= 0 ? `${story.chapters[chapterIndex].number} / ${story.chapters[chapterIndex].title}` : '序幕 / 永遠懷念 郭莒光先生';
   });
 
-  const highlightOrder = ['v22', 'v24', 'v02', 'v23', 'v16', 'v34', 'v01', 'v33', 'v14'];
-  const highlights = highlightOrder.map(id => story.highlights.find(h => h.id === id));
+  const highlights = [...story.highlights];
+  const previewHighlightCount = 3;
   let expandedHighlights = false;
   function renderHighlights() {
     $('#highlights').replaceChildren();
-    highlights.slice(0, expandedHighlights ? 9 : 3).forEach(highlight => {
+    highlights.slice(0, expandedHighlights ? highlights.length : previewHighlightCount).forEach(highlight => {
       const button = document.createElement('button');
       button.className = 'highlight-card';
       button.setAttribute('aria-label', `播放精華：${highlight.title}`);
-      button.innerHTML = `<span class="highlight-image"><img src="${highlight.poster}" alt="${highlight.title}" loading="lazy" width="600" height="400"><span class="mini-play">${icon('play')}</span><span class="clip-duration">${Math.round(highlight.duration)} 秒精華</span></span><h3>${highlight.title}</h3><p>從 ${time(highlight.start)} 開始欣賞 ${icon('arrow')}</p>`;
+      button.innerHTML = `<span class="highlight-image"><img src="${resource(highlight.poster)}" alt="${highlight.title}" loading="lazy" width="600" height="400"><span class="mini-play">${icon('play')}</span><span class="clip-duration">${Math.round(highlight.duration)} 秒影像</span></span><h3>${highlight.title}</h3><p>從 ${time(highlight.start)} 開始觀看 ${icon('arrow')}</p>`;
       button.addEventListener('click', () => playAt(highlight.start));
       $('#highlights').append(button);
     });
-    $('#more-highlights').innerHTML = expandedHighlights ? `收起精華 ${icon('arrow')}` : `看看其他 6 段精華 ${icon('arrow')}`;
+    $('#more-highlights').innerHTML = expandedHighlights ? `收起其餘影像 ${icon('arrow')}` : `展開其餘 ${Math.max(0, highlights.length - previewHighlightCount)} 段影像 ${icon('arrow')}`;
+    $('#more-highlights').hidden = highlights.length <= previewHighlightCount;
     $('#more-highlights').setAttribute('aria-expanded', String(expandedHighlights));
   }
   $('#more-highlights').addEventListener('click', () => { expandedHighlights = !expandedHighlights; renderHighlights(); });
   renderHighlights();
 
-  const filterNames = ['全部回憶', '最初的我們', '山海之間', '熱鬧相聚', '日常幸福', '旅途風景', '還要一起', '動態相片'];
+  const filterNames = ['全部相片', ...story.chapters.map(chapter => chapter.title), '動態相片'];
+  const liveFilterIndex = filterNames.length - 1;
   let selectedFilter = 0;
   let filteredPhotos = [...story.photos];
   let visiblePhotos = 20;
   const filterButtons = filterNames.map((name, i) => {
     const button = document.createElement('button');
     button.className = 'filter';
-    button.innerHTML = (i === 7 ? icon('live') : '') + name;
+    button.innerHTML = (i === liveFilterIndex ? icon('live') : '') + name;
     button.setAttribute('aria-pressed', String(i === 0));
     button.addEventListener('click', () => {
       selectedFilter = i;
-      filteredPhotos = story.photos.filter(photo => !i || (i === 7 ? Boolean(photo.live) : photo.chapter === i));
+      filteredPhotos = story.photos.filter(photo => !i || (i === liveFilterIndex ? Boolean(photo.live) : photo.chapter === i));
       visiblePhotos = 20;
       renderGallery();
     });
@@ -111,7 +118,7 @@
       const button = document.createElement('button');
       button.className = 'photo-card';
       button.setAttribute('aria-label', `放大相片：${photo.caption}${photo.live ? '，含動態相片' : ''}`);
-      button.innerHTML = `<img src="${photo.thumb}" alt="${photo.caption}" width="${photo.width}" height="${photo.height}" loading="lazy" decoding="async">${photo.live ? `<span class="live-badge">${icon('live')} LIVE</span>` : ''}<span class="photo-caption">${photo.caption}</span>`;
+      button.innerHTML = `<img src="${resource(photo.thumb)}" alt="${photo.caption}" width="${photo.width}" height="${photo.height}" loading="lazy" decoding="async">${photo.live ? `<span class="live-badge">${icon('live')} 動態</span>` : ''}<span class="photo-caption">${photo.caption}</span>`;
       button.addEventListener('click', () => openLightbox(index));
       fragment.append(button);
     });
@@ -146,14 +153,14 @@
     currentPhoto = (index + filteredPhotos.length) % filteredPhotos.length;
     const photo = filteredPhotos[currentPhoto];
     stopLive();
-    $('#lightbox-image').src = photo.src;
+    $('#lightbox-image').src = resource(photo.src);
     $('#lightbox-image').alt = photo.caption;
     $('#lightbox-caption').textContent = photo.caption;
     $('#lightbox-chapter').textContent = story.chapters[photo.chapter - 1].title;
     $('#lightbox-count').textContent = `${String(currentPhoto + 1).padStart(2, '0')} / ${filteredPhotos.length}`;
     $('#live-toggle').hidden = !photo.live;
     const following = filteredPhotos[(currentPhoto + 1) % filteredPhotos.length];
-    const preload = new Image(); preload.src = following.src;
+    const preload = new Image(); preload.src = resource(following.src);
   }
   function openLightbox(index) {
     lightboxOpener = document.activeElement;
@@ -190,8 +197,8 @@
     if (!photo.live) return;
     $('#lightbox-image').hidden = true;
     liveVideo.hidden = false;
-    liveVideo.src = photo.live;
-    liveVideo.poster = photo.src;
+    liveVideo.src = resource(photo.live);
+    liveVideo.poster = resource(photo.src);
     $('#live-toggle').innerHTML = `${icon('live')}<span>回到照片</span>`;
     try { await liveVideo.play(); } catch { toast('請按動態相片的播放按鈕。'); }
   });
@@ -205,10 +212,10 @@
   const shareURL = () => { const url = new URL(location.href); url.hash = ''; url.search = ''; return url.href; };
   async function share() {
     if (navigator.share) {
-      try { await navigator.share({ title: story.title, text: '有些時光，值得一看再看。一起來看我們的回憶電影。', url: shareURL() }); return; }
+      try { await navigator.share({ title: '永遠懷念 郭莒光先生', text: '1960.06.02 — 2026.09.11。以影像珍藏爸爸的笑容，與親友一同追思。', url: shareURL() }); return; }
       catch (error) { if (error.name === 'AbortError') return; }
     }
-    try { await navigator.clipboard.writeText(shareURL()); toast('網址已複製，貼給親友就能一起欣賞。'); }
+    try { await navigator.clipboard.writeText(shareURL()); toast('網址已複製，可分享給親友一同追思。'); }
     catch { $('#share-url').value = shareURL(); $('#share-dialog').showModal(); $('#share-url').select(); }
   }
   document.querySelectorAll('[data-share]').forEach(button => button.addEventListener('click', share));

@@ -1,24 +1,28 @@
-# 一起走過的日子
+# 郭莒光先生追思紀念
 
-一部關於家人、旅行與日常的回憶電影，以及可公開瀏覽的互動相簿。
+父親 郭莒光先生｜1960.06.02 — 2026.09.11
+
+為告別式製作的追思影片與公開紀念相簿，珍藏爸爸的身影、笑容與家人共同度過的時光。
 
 公開網站：https://knut921.github.io/our-days-2026/
 
-- 影片長度 9 分 51 秒，1080p，H.264 / AAC。
-- 109 張照片，每張約 4 秒，交叉淡化與緩慢推近。
-- 9 支影片精華剪成 11 個片段，另保留 25 張 Live Photos 的短動態。
+- 影片長度約 10 分 04 秒（603.866667 秒），1080p，H.264 / AAC。
+- 109 張照片，每張 4 秒，以交叉淡化銜接。
+- 8 段以父親入鏡為主的影片精華，另保留 25 張 Live Photos 的短動態。
+- 直式照片與影片保留中央完整畫面，以同一素材的柔焦影像填滿左右兩側；照片不作推近或平移。
+- 片頭、六個篇章與片尾以家人對爸爸說話的追思文字呈現，未新增口白配音。
 - 六個章節、精華跳轉、相簿分類、放大瀏覽、動態相片播放與 MP4 下載。
 - 手機與電腦皆可瀏覽，無須登入。
 
 ## 配樂
 
-“Life of Riley” — Kevin MacLeod (incompetech.com)
+“Gymnopedie No. 1” — Composed by Erik Satie; performed by Kevin MacLeod (incompetech.com).
 
-來源：https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1400054
+來源：https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100787
 
 Licensed under Creative Commons Attribution 4.0: https://creativecommons.org/licenses/by/4.0/
 
-音樂已剪輯、循環、淡入淡出，並與現場聲音混合。原始照片與影片不因配樂授權而改變其權利歸屬。
+鋼琴配樂經剪輯、循環、淡入淡出與音量混合。正片僅在父親唱歌、抱孩子及駕車與家人同行的三段保留適度降低音量的原始聲音，出現時同步壓低配樂，其餘片段的原始音訊靜音。相簿中的動態相片互動播放仍保留原始聲音。
 
 ## 網站
 
