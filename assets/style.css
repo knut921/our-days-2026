@@ -144,6 +144,13 @@ h1 { font-family: var(--serif); margin: 28px 0 17px; font-weight: 500; }
 .closing h2 { font: 36px/1.8 var(--serif); letter-spacing: 4px; margin: 20px 0 16px; }
 .closing > p:not(.eyebrow) { font-size: 16px; letter-spacing: 1px; color: var(--muted); }
 .closing .button { margin-top: 29px; }
+.family-remembrance { border-top: 1px solid var(--line); padding: 48px 0 60px; }
+.family-remembrance h2 { margin: 0 0 30px; text-align: center; font: 27px/1.8 var(--serif); letter-spacing: 4px; }
+.family-list { max-width: 420px; margin: 0 auto; padding: 0 20px; }
+.family-list > div { display: grid; grid-template-columns: 90px 1fr; gap: 22px; padding: 11px 0; font: 19px/1.8 var(--serif); letter-spacing: 2px; }
+.family-list dt { color: var(--muted); }
+.family-list dd { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 22px; }
+.family-list dd span { white-space: nowrap; }
 .site-footer { border-top: 1px solid var(--line); padding: 28px 0 34px; display: flex; justify-content: space-between; align-items: flex-start; gap: 30px; }
 .footer-brand { font: 21px/1.6 var(--serif); letter-spacing: 1.5px; }
 .site-footer p { font-size: 13px; line-height: 1.9; letter-spacing: .5px; color: var(--muted); margin-top: 10px; }
