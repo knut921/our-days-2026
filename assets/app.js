@@ -4,11 +4,12 @@
   const $ = selector => document.querySelector(selector);
   const icon = name => `<svg aria-hidden="true"><use href="#i-${name}"/></svg>`;
   const time = seconds => `${Math.floor(seconds / 60).toString().padStart(2, '0')}:${Math.floor(seconds % 60).toString().padStart(2, '0')}`;
-  const resource = path => `${path}${path.includes('?') ? '&' : '?'}v=memorial-20260914`;
+  const resource = path => `${path}${path.includes('?') ? '&' : '?'}v=${story.version}`;
   document.querySelectorAll('[data-film-duration]').forEach(node => { node.textContent = time(Math.round(story.duration)); });
   document.querySelectorAll('[data-photo-count]').forEach(node => { node.textContent = story.photos.length; });
   document.querySelectorAll('[data-video-count]').forEach(node => { node.textContent = story.highlights.length; });
   document.querySelectorAll('[data-live-count]').forEach(node => { node.textContent = story.photos.filter(photo => photo.live).length; });
+  document.querySelectorAll('[data-film-photo-count]').forEach(node => { node.textContent = story.filmPhotoCount; });
   const movie = $('#movie');
   const screenPlay = $('#screen-play');
   let toastTimer;
@@ -89,8 +90,9 @@
   $('#more-highlights').addEventListener('click', () => { expandedHighlights = !expandedHighlights; renderHighlights(); });
   renderHighlights();
 
-  const filterNames = ['全部相片', ...story.chapters.map(chapter => chapter.title), '動態相片'];
-  const liveFilterIndex = filterNames.length - 1;
+  const filterNames = ['全部相片', ...story.chapters.map(chapter => chapter.title), '動態相片', '影片精選'];
+  const liveFilterIndex = filterNames.length - 2;
+  const filmFilterIndex = filterNames.length - 1;
   let selectedFilter = 0;
   let filteredPhotos = [...story.photos];
   let visiblePhotos = 20;
@@ -101,7 +103,7 @@
     button.setAttribute('aria-pressed', String(i === 0));
     button.addEventListener('click', () => {
       selectedFilter = i;
-      filteredPhotos = story.photos.filter(photo => !i || (i === liveFilterIndex ? Boolean(photo.live) : photo.chapter === i));
+      filteredPhotos = story.photos.filter(photo => !i || (i === liveFilterIndex ? Boolean(photo.live) : i === filmFilterIndex ? photo.inFilm : photo.chapter === i));
       visiblePhotos = 20;
       renderGallery();
     });
@@ -157,6 +159,8 @@
     $('#lightbox-image').alt = photo.caption;
     $('#lightbox-caption').textContent = photo.caption;
     $('#lightbox-chapter').textContent = story.chapters[photo.chapter - 1].title;
+    $('#watch-photo').hidden = !Number.isFinite(photo.movieTime);
+    $('#album-only-note').hidden = Number.isFinite(photo.movieTime);
     $('#lightbox-count').textContent = `${String(currentPhoto + 1).padStart(2, '0')} / ${filteredPhotos.length}`;
     $('#live-toggle').hidden = !photo.live;
     const following = filteredPhotos[(currentPhoto + 1) % filteredPhotos.length];
@@ -205,6 +209,7 @@
   liveVideo.addEventListener('error', () => { if (liveVideo.getAttribute('src')) toast('動態相片無法載入，請稍後再試。'); });
   $('#watch-photo').addEventListener('click', () => {
     const start = filteredPhotos[currentPhoto].movieTime;
+    if (!Number.isFinite(start)) return;
     lightbox.close();
     playAt(start);
   });
