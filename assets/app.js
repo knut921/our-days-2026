@@ -12,6 +12,21 @@
   document.querySelectorAll('[data-film-photo-count]').forEach(node => { node.textContent = story.filmPhotoCount; });
   const movie = $('#movie');
   const screenPlay = $('#screen-play');
+  const memorialMovie = $('#memorial-movie');
+  document.querySelectorAll('[data-memorial-play]').forEach(button => button.addEventListener('click', async () => {
+    $('#memorial').scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+    movie.pause();
+    try { await memorialMovie.play(); }
+    catch { toast('請按影片控制列播放，或下載追思影片觀看。'); }
+  }));
+  memorialMovie.addEventListener('play', () => {
+    movie.pause();
+    $('#memorial-screen-play').hidden = true;
+  });
+  memorialMovie.addEventListener('ended', () => { $('#memorial-screen-play').hidden = false; });
+  memorialMovie.addEventListener('error', () => toast('追思影片暫時無法載入，請重新整理或下載影片。'));
+  movie.addEventListener('play', () => memorialMovie.pause());
+
   let toastTimer;
   const toast = message => {
     $('#toast').textContent = message;
@@ -21,6 +36,7 @@
   };
 
   async function playAt(seconds = 0) {
+    memorialMovie.pause();
     $('#film').scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
     try {
       if (movie.readyState === 0) {
@@ -38,7 +54,7 @@
   $('#restart').addEventListener('click', () => playAt(0));
   movie.addEventListener('play', () => { screenPlay.hidden = true; });
   movie.addEventListener('ended', () => { $('#now-playing').textContent = '爸爸，謝謝您。我們永遠想念您。'; });
-  movie.addEventListener('error', () => toast('影片暫時無法載入，請重新整理，或使用「下載追思影片」。'));
+  movie.addEventListener('error', () => toast('影片暫時無法載入，請重新整理，或使用「下載生活點滴」。'));
   $('#fullscreen').addEventListener('click', async () => {
     try {
       if (movie.requestFullscreen) await movie.requestFullscreen();
@@ -169,6 +185,7 @@
   function openLightbox(index) {
     lightboxOpener = document.activeElement;
     movie.pause();
+    memorialMovie.pause();
     showPhoto(index);
     lightbox.showModal();
     document.body.style.overflow = 'hidden';

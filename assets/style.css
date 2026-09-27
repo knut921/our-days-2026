@@ -315,3 +315,5 @@ dialog::backdrop { background: #11120ff0; backdrop-filter: blur(6px); }
 
 .updated-date { font-size: 12px; color: var(--muted); }
 #album-only-note { font-size: 13px; color: var(--muted); }
+
+.memorial-feature { border-top: 3px solid var(--gold); border-bottom: 1px solid #ffffff25; }
